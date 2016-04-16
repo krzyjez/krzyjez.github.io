@@ -1,9 +1,48 @@
 ---
-published: true
+published: false
 title: Mikroserwisy
 layout: post
+tags: [typescript]
 ---
-Inspiracja
---------------
+# Problem: Jak wymusić statyczne pole w klasie?
+Do fabryki przekazuję klasę. Fabryka będzie produkowała egzemplarze (obiekty) danej klasy. Potrzebuję jednak dodatkowych "parametrów" - np. nazwy związanej z daną klasą. Taka sytuacja zaistniała gdy stworzyłem sobie abstrakcyjną klasę modułu (Angular), do której przekazywałem klasę serwisu. Otrzymała ona postać:
 
-Ostatnio wpadła mi w ręce książka Sam’a Newman’a “Building Microservices”. Odnosi się ona do architektury systemów rozporoszonych, których głównym elementem są tytułowe mikroservisy. Autor definiuje je jako osobne procesy systemowe uruchamiane na tym samym komputerze lub komputerze lub na odrębnych komputerach w sieci lokalnej lub w chmurze. Zaletą tej architektury jest skalowalność, łatwość rozbudowy i modyfikacji, odporność na awarie. Dla mnie kluczową zaletą jest łatwość percepcyjna. Wydaje mi się, że łatwiej jest zrozumieć system w którym mamy do czynienia z niewielkimi, stosunkowo prostymi, precyzyjnie wydzielonymi “jednostkami działania” (mikrousługami) komunikującymi się między sobą wg. ściśle określonego api niż wielki monolityczny system z wieloma nieoczywistymi zależnościami wewnętrznymi. Konieczność utworzenia interfejsu API komunikacji między mikroserwisami wymusza klarowność interakcji. W systemie monolitycznym mamy wprawdzie klasy - które można by uznać za analogiczne “cegiełki”. Jednak łatwość z jaką klasy mogą się między sobą komunikować sprawia, że relacji zależności robi się bardzo dużo i mogą być bardzo zagmatwane. 
+`addService(serviceName :string; serviceClass :Function) void;`
+
+Wygląda to dokładnie tak jak rejestracja serwisu w JavaScripcie. Chciałem jednak by nazwa serwisu była bardziej związana z klasą serwisu - w związku z tym powinna być deklarowana w samej klasie serwisu. Potrzebowałbym również jakiegoś mechanizmu wymuszającego dodanie nazwy w klasie serwisu. W idealnym świecie wyglądałoby to mniej więcej tak:
+
+```typescript
+interface IService {
+  static $name :string;
+}
+
+class MyService implements IService {
+  $name :string; 
+}
+
+module.addService(MyService);
+```
+
+Niestety świat nie jest idealny i TypeScript nie dopuszcza statycznych pól w interfejsie. Możemy jedna je wymóc w ten sposób:
+
+```typescript
+interface IService {
+  $name :string;
+}
+class MyService {
+  static $name :string; 
+}
+
+class Module {
+  addService(sercieClass :IService) :void {
+  }
+}
+
+let module = new Module();
+module.addService(MyService);
+```
+Powyższy kod wymusza na MyService aby miał statyczne pole `$name` - w przypadku jego braku zwracany jest błąd. Jak widać wymuszamy pole statyczne nie w samej klasie `MyService` -  w której chcielibyśmy je wymusić ale w klasach, które z niej korzystają. 
+
+A oto skompilowany kod z przykładem:
+
+https://gist.github.com/krzyjez/e3a2c116499ed958b7f4.js
