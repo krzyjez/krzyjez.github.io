@@ -1,0 +1,8 @@
+excerpt_separator: ""
+pygments: true
+markdown: kramdown
+url: http://krzyjez.github.io
+title: Krzysztof Je¿
+tagline: Thinking after coding
+description: My awesome new site
+paginate: 5
