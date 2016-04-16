@@ -5,6 +5,7 @@ layout: post
 tags: [typescript]
 ---
 # Problem: Jak wymusić statyczne pole w klasie?
+
 Do fabryki przekazuję klasę. Fabryka będzie produkowała egzemplarze (obiekty) danej klasy. Potrzebuję jednak dodatkowych "parametrów" - np. nazwy związanej z daną klasą. Taka sytuacja zaistniała gdy stworzyłem sobie abstrakcyjną klasę modułu (Angular), do której przekazywałem klasę serwisu. Otrzymała ona postać:
 
 `addService(serviceName :string; serviceClass :Function) void;`
